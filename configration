@@ -1,0 +1,22 @@
+#!/bin/bash
+###script for Monitor every 1 min the system load
+UPTIME=$(uptime)
+FROM1MIN=$(echo ${UPTIME} | awk '{print $8}'| sed "s/","//g")
+FROM5MIN=$(echo ${UPTIME} | awk '{print $9}'| sed "s/","//g")
+FROM15MIN=$(echo ${UPTIME} | awk '{print $10}'| sed "s/","//g")
+
+TEST=$(echo "${FROM1MIN} > ${FROM5MIN}" | bc)
+TEST1=$(echo "${FROM5MIN} > ${FROM15MIN}" | bc)
+
+if [ ${TEST} -eq 1 ] && [ ${TEST1} -eq 1 ]
+
+then
+        echo "load= $(echo ${UPTIME}|awk '{print $8 $9 $10}'| sed 's/,//g') date= $(date) " >> /var/log/systemLoad
+        echo
+        "Dear, 
+                                The system ${HOSTNAME} runs with IP 192.168.124.159 has a load of 
+                                1MIN load: ${FROM1MIN}
+                                5MIN load: ${FROM5MIN}
+                                15MIN load: ${FROM15MIN}
+                        Thank you." >> /tmp/events
+fi
